@@ -1,6 +1,19 @@
 #!/bin/bash
 
-PASSYWORD=`./autotypewrite | grep "....." | shuf -n 2`
+if [ -z $1 ]; then
+    TIMES="1"
+else
+	TIMES="$1"
+    echo "$1 times"
+fi
+if [ -z $2 ]; then
+    SCRIPT=""
+else
+    SCRIPT="$2"
+fi
+
+for m in `seq 1 $TIMES`; do
+PASSYWORD=`./autotypewrite $SCRIPT | grep "....." | shuf -n 2`
 PASSWORD=$( echo "$PASSYWORD" | perl -pe 's/\n//g' )
 PASSYWORD=`echo "${PASSYWORD}" | perl -pe 's/\n/ /g'`
 
@@ -34,3 +47,9 @@ done
 ENDSTRING="${ENDSTRING}# $PASSYWORD"
 echo "$ENDSTRING"
 #echo "$GENERATED"
+SALT="$( cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 16 | head -n 1 )"
+export GENERATED
+export SALT
+HASH=`perl -e 'print crypt("$ENV{'GENERATED'}","\\$6\\$$ENV{'SALT'}\\$") . "\n"'`
+echo -e "        SALT $SALT HASH $HASH\n"
+done
