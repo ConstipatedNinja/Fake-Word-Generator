@@ -1,7 +1,9 @@
 #!/usr/bin/perl
-
-open(WORDS, "+<wordsEn.txt");
-
+if ($ARGV[0]) {
+  open(WORDS, "+<$ARGV[0]");
+} else {
+  print "Usage: $0 filename$/";
+}
 @words = <WORDS>;
 
 close(WORDS);

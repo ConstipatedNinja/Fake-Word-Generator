@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PASSYWORD=`/home/william8/scripts/typewritingsmall | grep "....." | shuf -n 2`
+PASSYWORD=`./autotypewrite | grep "....." | shuf -n 2`
 PASSWORD=$( echo "$PASSYWORD" | perl -pe 's/\n//g' )
 PASSYWORD=`echo "${PASSYWORD}" | perl -pe 's/\n/ /g'`
 

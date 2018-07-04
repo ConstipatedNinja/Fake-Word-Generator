@@ -1,33 +1,8 @@
 #!/usr/bin/perl
 
-###################
-#
-# sudo_passwd
-#
-#	A script to change a user's sudo password or add a new user to the
-# sudo passwords file.
-#
-###################
 use strict;
 use Sys::Hostname;
 
-
-# Where is the sudo password file kept?
-#my $password_file = '/var/local/webuser/sudo.passwd.new';
-
-# Where will this script work?
-#my $theOnlyHostThisWillWorkOn = 'hydrogen.rcac.purdue.edu';
-
-# Because we mess with the tty settings, trap interrupts
-#$SIG{'INT'} = 'INT_handler';
-
-#########
-#
-# showUsage subroutine
-#
-#	Display the usage
-#
-#########
 
 sub showUsage {
 	print "Usage:  sudo_passwd <username>\n\n";
@@ -37,53 +12,13 @@ sub showUsage {
 	exit 0;
 }
 
-#########
-#
-# INT_handler subroutine
-#
-# 	Clean up after ourselves if the user issues an interrupt.
-#
-#########
-
-#sub INT_handler {
-#	# Close the file, just in case it's open. Probably not necessary, but
-#	# let's be paranoid.
-#	close (PASSWORDFILE);
-#	# Restore the tty settings
-#	system("stty echo icanon");
-#
-#	exit (1);
-#}
-
 my $username = $ARGV[0];
 
-# If you're not root, the rest of this script won't do you much good. Let's
-# check and exit if not being run as root.
-#unless ( $< == 0 ) { die "You must be root to run this\n"; }
-
-# Are you running this on $theOnlyHostThisWillWorkOn? If not, that's a
-# bad decision.
-#my $hostname = hostname;
-#unless ( "$hostname" eq "$theOnlyHostThisWillWorkOn" ) { die "You must run this on $theOnlyHostThisWillWorkOn\n"; }
-
-# If we're still here, make sure there is an argument specified
 unless ( $#ARGV == 0 ) {
 	warn "You must specify a user\n";
 	showUsage;
 }
 
-# Check to see if the user account is valid
-#system("id $username >/dev/null 2>&1");
-#if ( $? ) { die "User $username does not appear to be valid\n"; }
-
-# Read the password file
-#my @password_entries;
-#open (PASSWORDFILE, "<$password_file") or
-#	die "Could not read file $password_file\n";
-#@password_entries = <PASSWORDFILE>;
-#close (PASSWORDFILE);
-
-# Get the new password
 my $password1='one';
 my $password2='two';
 # For the sake of paranoia, disable echoing. This will break if we try
@@ -112,30 +47,3 @@ $salt = join('', '$1$', $salt, '$');
 my $hashed_password = crypt("$password1", $salt);
 print "Your hash: $hashed_password \n";
 exit
-## Check to see if the user exists in the sudo password file
-#my $user_exists = grep(/^$username:/, @password_entries);
-#
-#if ( $user_exists ) {
-#	# The user exists, let's reset the password
-#	for ( @password_entries) {
-#		$_ =~ s/^$username:(.*)/$username:$hashed_password/;
-#	}
-#	print "Updated password for user $username\n";
-#} else {
-#	# The user doesn't exist, add them to the array
-#	push(@password_entries,"$username:$hashed_password");
-#	print "Added password for user $username\n";
-#}
-#
-## We've reached that magical moment where it's time to write the updated file
-#open (PASSWORDFILE, ">$password_file") or 
-#	die "Could not write to file $password_file\n";
-#for ( @password_entries ) {
-#	chomp ($_);
-#	print PASSWORDFILE "$_\n";
-#}
-#close (PASSWORDFILE);
-#
-#print "You must still run /etc/cron.hourly/instsudopw as appropriate.\n";
-#exit 0;
-#

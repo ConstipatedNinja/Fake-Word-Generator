@@ -1,6 +1,6 @@
 #!/bin/perl
 
-open(WORDS, "+</home/william8/scripts/smallwordsEn.txt");
+open(WORDS, "+<../dictionary_files/dictionary.txt");
 
 @words = <WORDS>;
 
