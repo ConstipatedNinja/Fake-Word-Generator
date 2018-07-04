@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+open(WORDS, "+<wordsEn.txt");
+
+@words = <WORDS>;
+
+close(WORDS);
+
+foreach $li (@words) {
+  chomp $li;
+  if ( $li =~ m/(^([qwertasdfgzxcvb][yuiophjklnm])+$)|(^([yuiophjklnm][qwertasdfgzxcvb])+$)/ ) {
+    if ( length($li) >= 6 ) {
+      print "$li\n";
+    }
+#  } else {
+#    print "$li\n";
+  }
+}
+
