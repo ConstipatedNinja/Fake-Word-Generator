@@ -1,10 +1,25 @@
 #!/bin/perl
-if ($ARGV[0]) {
-  open(WORDS, "+<$ARGV[0]");
-} else {
-  open(WORDS, "+<../dictionary_files/large_dictionary.txt");
-}
+# By: Lily Williamson
+# Lists words from a dictionary file that are "typewriter words"
+# That is, words where each character is typed by alternating hands
+# Optionally, use the -b flag to not print exact matches of bad words
+use Getopt::Long;
 
+$filter_bad_words=0;
+GetOptions(
+  "b" => \$filter_bad_words,
+);
+if ($ARGV[0]) {
+  open(WORDS, "<$ARGV[0]");
+} else {
+  open(WORDS, "<../dictionary_files/large_dictionary.txt");
+}
+if ($filter_bad_words) {
+  open(BAD_WORDS, "<../dictionary_files/bad_words.txt");
+  @bad_words = <BAD_WORDS>;
+  chomp(@bad_words);
+  close(BAD_WORDS);
+}
 @words = <WORDS>;
 
 close(WORDS);
@@ -12,8 +27,10 @@ close(WORDS);
 foreach $li (@words) {
   chomp $li;
   if ( $li =~ m/(^([qwertasdfgzxcvb][yuiophjklnm])+$)|(^([yuiophjklnm][qwertasdfgzxcvb])+$)/ ) {
-    if ( length($li) >= 6 ) {
-      print "$li\n";
+    if ( !$filter_bad_words || !grep { $_ eq $li } @bad_words ) {
+      if ( length($li) >= 6 ) {
+        print "$li\n";
+      }
     }
 #  } else {
 #    print "$li\n";
