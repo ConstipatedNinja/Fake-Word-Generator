@@ -28,7 +28,7 @@ Example:
 ```
 
 ## passwordgen.sh
-This script is intended to turn words from a dictionary file into more secure passwords, using the autotypewrite script to filter for fast-to-type words. To really get the most from this, use genfakewords to generate a dictionary file of fake words and use that for this script. All arguments are optional, and defaults to the large_dictionary.txt dictionary file.
+This script is intended to turn words from a dictionary file into more secure passwords and uses the autotypewrite script to filter for fast-to-type words. To really get the most from this, use genfakewords to generate a huge dictionary file of fake words and use that for this script. All arguments are optional, and defaults to the large_dictionary.txt dictionary file.
 
 Takes two arguments: an output count and a dictionary file
 
