@@ -13,12 +13,12 @@
 
 use Getopt::Long;
 
-my $min_length  = 5;
-my $max_length  = 10;
-my $file        = "../dictionary_files/large_dictionary.txt";
-my $outfile     = undef;
-my $show_hash   = 0;
-my $number      = 25;
+our $min_length  = 5;
+our $max_length  = 10;
+$file        = "../dictionary_files/large_dictionary.txt";
+$outfile     = undef;
+$show_hash   = 0;
+$number      = 25;
 
 # capture any input number before GetOptions
 for (my $i = $#ARGV; $i >= 0; $i--) {
@@ -85,12 +85,12 @@ for (1..$number) {
 # Messy recursive function to build a word, getting rid of short words 
 # and handling "seeds" from previous words properly
 sub new_word {
-  my $word = pop;
+  my $word = shift;
   my $pair = substr($word, -2, 2);
   my $letter = substr($hash{$pair}, rand length($hash{$pair}), 1);
-  if ($word =~ /\s$/) {
-    return $word if (length($word) > $min_length);
-    return &new_word(substr($word, -1, 1).$letter);
+  if ($letter =~ /\s$/) {
+    return substr($word, 0, $max_length) if (length($word) >= $min_length);
+    return &new_word($word);
   } else {
     $word =~ s/^\s//;
     return &new_word($word.$letter);
