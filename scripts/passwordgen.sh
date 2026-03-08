@@ -1,5 +1,8 @@
 #!/bin/bash
-
+# By: Lily Williamson
+# All arguments are optional.
+# First argument sets the number of runs
+# Second argument sets the dictionary file
 if [ -z $1 ]; then
     TIMES="1"
 else
