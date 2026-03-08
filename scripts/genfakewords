@@ -1,5 +1,11 @@
 #!/usr/bin/perl
-#
+# By Lily Williamson
+# This is a bit of a disaster but it works!
+# $number is the number of fake words you get back
+# $min_length and $max_length set the limits of the fake word's size
+# If you use this to generate a dictionary file and then 
+#  point passwordgen.sh at it, you can make secure passwords that are
+#  (mostly) pronounceable but aren't dictionary words.
 $unix = 1;
 $file = 'dictionary.txt';
 $number = 25;
