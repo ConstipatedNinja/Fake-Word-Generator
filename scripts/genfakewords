@@ -11,52 +11,37 @@
 # -i optionally lets you pick an input dictionary to have the script learn what words are
 # -o optionally lets you direct output to somewhere other than stdout
 
-use Getopt::Long;
-
-our $min_length  = 5;
-our $max_length  = 10;
-$file        = "../dictionary_files/large_dictionary.txt";
-$outfile     = undef;
-$show_hash   = 0;
-$number      = 25;
-
-# capture any input number before GetOptions
-for (my $i = $#ARGV; $i >= 0; $i--) {
-    if ($ARGV[$i] =~ /^-(\d+)$/) {
-        $number = $1;
-        splice(@ARGV, $i, 1);
-    }
+$file = '../dictionary_files/large_dictionary.txt';
+$number = 25;
+$min_length = 5;
+$max_length = 10;
+while (@ARGV) {
+    $_ = shift @ARGV;
+    if (/^-(\d+)$/)      { $number = $1; }
+    elsif (/^-m$/)       { $min_length = shift @ARGV; }
+    elsif (/^-M$/)       { $max_length = shift @ARGV; }
+    elsif (/^-i$/)       { $file = shift @ARGV; }
+    elsif (/^-o$/)       { $outfile = shift @ARGV; open(STDOUT, ">$outfile"); }
+    elsif (/^-s$/)       { $number = 's'; }
+    elsif (!/^-/)        { $file = $_; } # Fallback for positional filename
 }
-GetOptions(
-    "m=i"           => \$min_length,
-    "M=i"           => \$max_length,
-    "i|input-file=s"  => \$file,
-    "o|output-file=s" => \$outfile,
-    "s"             => \$show_hash,
-) or die "Usage: $0 [-#] [-m min] [-M max] [-i input] [-o output] [-s]\n";
-
+$number = 's' if $show_hash;
+$number =~ s/-//;
 if ($outfile) {
-    open(STDOUT, ">", $outfile) or die "Can't open output file $outfile: $!";
-}
-if ($show_hash) {
-    # (Hash loading logic would need to happen before this)
-    # This matches your original logic flow
-    $number = 's'; 
+    open(STDOUT, ">", $outfile) or die "Can't open $outfile: $!";
 }
 srand(time);
 
 # Read in the data, cleaning it up as we go, and making it one long array
-open(INFILE, "<", $file) or die "$0: $file not found: $!\n";
+open(INFILE, $file) or die "$0: $file not found\n";
 while (<INFILE>) {
   s/#.*//;
-  next unless /\S/; # Skip empty/whitespace lines
-  s/^\s*//; 
-  s/\s*\n//; 
-  s/ +/ /g;
-  push(@data, ' ', split('', $_)); 
+  next unless length;
+  s/^\s*//;
+  s/\s*\n//;
+  s/\s+/ /;
+  push(@data, ' ', split('', $_));
 }
-close(INFILE);
-
 # Let's assume the first letter could follow the last pair (loop around)
 push(@data, ' ', $data[1]);
 
@@ -66,7 +51,7 @@ while (@data > 2) {
   ($first, $second, $third) = @data[0..2];
   $hash{$first.$second} .= $third;
   push(@start_pairs, $second.$third) if ($first eq ' ');
-  shift @data; 
+  shift @data;
 }
 
 # Oh, so you just want to see a representation of our hash??? OK.
@@ -82,16 +67,15 @@ for (1..$number) {
   print substr($new, 0, $max_length), "\n";
 }
 
-# Messy recursive function to build a word, getting rid of short words 
-# and handling "seeds" from previous words properly
+# Messy recursive function to build a word, getting rid of short words
+# and handling seeds from previous words
 sub new_word {
-  my $word = @_;
+  my $word = pop;
   my $pair = substr($word, -2, 2);
   my $letter = substr($hash{$pair}, rand length($hash{$pair}), 1);
-  if ($letter =~ /\s$/) {
-    return substr($word, 0, $max_length) if (length($word) >= $min_length);
-    $word =~ s/^\s+//;
-    return &new_word($word);
+  if ($word =~ /\s$/) {
+    return $word if (length($word) > $min_length);
+    return &new_word(substr($word, -1, 1).$letter);
   } else {
     $word =~ s/^\s//;
     return &new_word($word.$letter);
