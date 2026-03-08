@@ -26,9 +26,9 @@ close(WORDS);
 
 foreach $li (@words) {
   chomp $li;
-  if ( $li =~ m/(^([qwertasdfgzxcvb][yuiophjklnm])+$)|(^([yuiophjklnm][qwertasdfgzxcvb])+$)/ ) {
+  if ( $li =~ m/^([qwertasdfgzxcvb]([yuiophjklnm][qwertasdfgzxcvb])*)[yuiophjklnm]?$/ || $li =~ m/^([yuiophjklnm]([qwertasdfgzxcvb][yuiophjklnm])*)[qwertasdfgzxcvb]?$/ ) {
     if ( !$filter_bad_words || !grep { $_ eq $li } @bad_words ) {
-      if ( length($li) >= 6 ) {
+      if ( length($li) >= 5 ) {
         print "$li\n";
       }
     }
