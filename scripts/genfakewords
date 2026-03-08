@@ -20,6 +20,13 @@ my $outfile     = undef;
 my $show_hash   = 0;
 my $number      = 25;
 
+# capture any input number before GetOptions
+for (my $i = $#ARGV; $i >= 0; $i--) {
+    if ($ARGV[$i] =~ /^-(\d+)$/) {
+        $number = $1;
+        splice(@ARGV, $i, 1);
+    }
+}
 GetOptions(
     "m=i"           => \$min_length,
     "M=i"           => \$max_length,
@@ -28,14 +35,6 @@ GetOptions(
     "s"             => \$show_hash,
 ) or die "Usage: $0 [-#] [-m min] [-M max] [-i input] [-o output] [-s]\n";
 
-# capture any input number
-if (@ARGV) {
-  for my $arg (@ARGV) {
-    if ($arg =~ /^-(\d+)$/) {
-      $number = $1;
-    }
-  }
-}
 if ($outfile) {
     open(STDOUT, ">", $outfile) or die "Can't open output file $outfile: $!";
 }
