@@ -88,7 +88,7 @@ sub new_word {
   my $word = shift;
   my $pair = substr($word, -2, 2);
   my $letter = substr($hash{$pair}, rand length($hash{$pair}), 1);
-  if ($word =~ /\s$/) {
+  if ($letter =~ /\s$/) {
     return substr($word, 0, $max_length) if (length($word) >= $min_length);
     $word =~ s/^\s+//;
     return &new_word($word);
