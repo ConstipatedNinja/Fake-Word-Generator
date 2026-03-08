@@ -85,7 +85,7 @@ for (1..$number) {
 # Messy recursive function to build a word, getting rid of short words 
 # and handling "seeds" from previous words properly
 sub new_word {
-  my $word = shift;
+  my $word = @_;
   my $pair = substr($word, -2, 2);
   my $letter = substr($hash{$pair}, rand length($hash{$pair}), 1);
   if ($letter =~ /\s$/) {
