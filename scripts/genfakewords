@@ -1,40 +1,62 @@
 #!/usr/bin/perl
 # By Lily Williamson
 # This is a bit of a disaster but it works!
-# $number is the number of fake words you get back
-# $min_length and $max_length set the limits of the fake word's size
 # If you use this to generate a dictionary file and then 
 #  point passwordgen.sh at it, you can make secure passwords that are
 #  (mostly) pronounceable but aren't dictionary words.
-$unix = 1;
-$file = 'dictionary.txt';
-$number = 25;
+# All options are optional.
+# Example command: ./genfakewords -1000 -m 6 -M 12 -i my_dict.txt -o output.txt
+# -1000 means it'll give you 1000 fake words - default 25
+# -m 6 -M 12 will give you words 6-12 characters long - default 5-10
+# -i optionally lets you pick an input dictionary to have the script learn what words are
+# -o optionally lets you direct output to somewhere other than stdout
 
-# Define initial limits on good word lengths
-$min_length = 5;
-$max_length = 10;
-if ($ARGV[2]) {
-  $min_length = $ARGV[2];
+use Getopt::Long;
+
+my $min_length  = 5;
+my $max_length  = 10;
+my $file        = "../dictionary_files/large_dictionary.txt";
+my $outfile     = undef;
+my $show_hash   = 0;
+my $number      = 25;
+
+GetOptions(
+    "m=i"           => \$min_length,
+    "M=i"           => \$max_length,
+    "i|input-file=s"  => \$file,
+    "o|output-file=s" => \$outfile,
+    "s"             => \$show_hash,
+) or die "Usage: $0 [-#] [-m min] [-M max] [-i input] [-o output] [-s]\n";
+
+# capture any input number
+if (@ARGV) {
+  for my $arg (@ARGV) {
+    if ($arg =~ /^-(\d+)$/) {
+      $number = $1;
+    }
+  }
 }
-if ($ARGV[3]) {
-  $max_length = $ARGV[3];
+if ($outfile) {
+    open(STDOUT, ">", $outfile) or die "Can't open output file $outfile: $!";
+}
+if ($show_hash) {
+    # (Hash loading logic would need to happen before this)
+    # This matches your original logic flow
+    $number = 's'; 
 }
 srand(time);
-($unix and (@ARGV >= 2) and ($file = $ARGV[1]) and ($number = $ARGV[0])
-  and (($number =~ /^-\d+$/) or ($number =~ /^-s/)))
-  or ($unix and die "usage: $0 [-s|-#] filename [min_length] [max_length]\n    -s Returns a representation of the script's hash.\n    -# (ex. -10000) Returns # words.\n    min_length (default 5) Limits the minimum number of characters per word.\n    max_length (default 10) Limits the maximum number of characters per word.\n");
-$number =~ s/-//;
 
 # Read in the data, cleaning it up as we go, and making it one long array
-open(INFILE, $file) or die "$0: $file not found\n";
+open(INFILE, "<", $file) or die "$0: $file not found: $!\n";
 while (<INFILE>) {
   s/#.*//;
-  next unless length;
+  next unless /\S/; # Skip empty/whitespace lines
   s/^\s*//; 
   s/\s*\n//; 
-  s/\s+/ /;
+  s/ +/ /g;
   push(@data, ' ', split('', $_)); 
 }
+close(INFILE);
 
 # Let's assume the first letter could follow the last pair (loop around)
 push(@data, ' ', $data[1]);
